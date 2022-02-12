@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sample-secret
+data:
+  message: SGVsbG8gV29ybGQgLg==
+  keyfile: WU9VUi1TRUNSRVQtS0VZ
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sample
+spec:
+  containers:
+  - name: sample
+    image: nginx:1.17.2-alpine
+    # 1. 環境変数へ渡す
+    env:
+    - name: MESSAGE
+      valueFrom:
+        secretKeyRef:
+          name: sample-secret
+          key: message
+    # 2. ファイルとしてマウントする
+    volumeMounts:
+    - name: secret-storage
+      mountPath: /home/nginx
+  volumes:
+  - name: secret-storage
+    secret:
+      secretName: sample-secret
+      items:
+      - key: keyfile
+        path: keyfile
